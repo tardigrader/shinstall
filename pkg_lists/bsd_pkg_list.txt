@@ -1,6 +1,7 @@
 abook--
 adobe-source-code-pro--
 bash--
+cmake--
 colorls--
 curl--
 emacs--gtk3%emacs
