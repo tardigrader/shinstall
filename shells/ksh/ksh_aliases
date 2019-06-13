@@ -1,0 +1,55 @@
+######################################################################
+# Custom aliases 
+######################################################################
+
+# Source localized aliases if available
+if [ -x ~/.ksh_aliases.this ]; then
+    source ~/.ksh_aliases.this
+fi
+
+### Files, filesystems and directories ###
+
+# Enable color support of ls and grep and also add handy aliases
+if [ -x /usr/local/bin/colorls ]; 
+then
+    alias ls='/usr/local/bin/colorls'
+elif [ $(uname) = "OpenBSD" ];
+then
+  # Set colours for ls command
+  # TODO: Test if this works on a machine without colorls installed
+  export LS_COLORS="ow=01;93:di=00;93:ln=00;33" 
+fi
+
+ #   alias grep='grep --color=auto'
+ #   alias fgrep='fgrep --color=auto'
+ #   alias egrep='egrep --color=auto'
+
+alias df='df -h'
+alias ll='ls -la'
+alias lsa='ls -a'
+#TODO alias lsdirs='ls -la | grep :*/'            # Show directories only
+#TODO alias lsexe='ls -lA | grep \*'              # Show executables only
+alias lshid='ls -dF .*'
+alias mount='mount | column -t'
+alias path="echo $PATH | tr -s ':' '\n'"            # Pretty print $PATH
+
+# Change to root of git project
+alias groot='cd $(git rev-parse --show-cdup)'
+
+
+### Network aliases ###
+
+alias portar='netstat -atun'
+
+#if [ ! test -z $TEXTBROWSER ]; then
+#    alias whatsmyip="$TEXTBROWSER -dump checkip.dyndns.org"
+#fi
+
+alias pingalocal='echo 192.168.0.{1..255} | xargs -n1 ping -c1'
+
+
+### Misc aliases ###
+
+alias fingerprints='ssh-keygen -lv -f ~/.ssh/known_hosts'
+alias topcommands='cut -f1 -d " " ~/.bash_history | sort | uniq -c | sort -nr | head -12'
+alias vimsplit='vim -O '        # Edit multiple files split horizontally 

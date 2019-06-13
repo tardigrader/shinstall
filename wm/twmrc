@@ -1,0 +1,286 @@
+#
+# Default twm configuration file; needs to be kept small to conserve 
+# string space in systems whose compilers don't handle medium-sized 
+# strings.
+#
+# Sites should tailor this file, providing any extra title buttons, menus, 
+# etc. that may be appropriate for their environment.  For example, if 
+# most of the users were accustomed to uwm, the defaults could be set up 
+# not to decorate any windows and to use meta-keys.
+
+NoGrabServer              # When popping up menus or moving opaque windows
+RestartPreviousState      # Remember previous state when wm is restarted
+DecorateTransients        # Transient windows should have titlebars
+RandomPlacement
+OpaqueMove                # Actually move window instead of outline
+NoRaiseOnMove             # Allow moving under other windows
+BorderWidth     5
+MenuBorderWidth 5
+
+### FONTS ###
+
+TitleFont "-adobe-helvetica-medium-r-normal--*-80-*-*-*-*-*-*"
+ResizeFont "-adobe-helvetica-bold-r-normal--*-80-*-*-*-*-*-*"
+MenuFont "-adobe-helvetica-bold-r-normal--*-80-*-*-*-*-*-*"
+IconFont "-adobe-helvetica-medium-r-normal--*-80-*-*-*-*-*-*"
+#ClientBorderWidth
+
+Color
+{
+        BorderColor         "Black"
+        BorderTileBackground "Black"
+        DefaultBackground   "White"
+        DefaultForeground   "Black"
+
+        TitleBackground     "Firebrick"
+        TitleForeground     "White"
+
+        MenuTitleBackground "Black"
+        MenuTitleForeground "White"
+
+        MenuBackground      "Firebrick"
+        MenuForeground      "white"
+
+        MenuShadowColor     "Black"
+        MenuBorderColor     "Black"
+}
+
+### ICONS etc ###
+
+ShowIconManager                          # Show icon manager on startup
+IconManagerGeometry     "=250x40"
+IconManagerFont         "-adobe-helvetica-medium-r-normal--*-80-*-*-*"
+Color
+{
+IconManagerBackground   "Firebrick"
+IconManagerForeGround   "Black" 
+IconManagerHighlight    "Black"
+}
+
+# Directory for non default icons
+
+IconDirectory           "/home/krr/.twm/icons"
+
+# Define regions to put icons (multiple lines allowed)
+# IconRegion  geomstring  # define geometry)
+#   vgrav   # North or South fill direction
+#   hgrav   # East for West fill direction
+#   gridwidth # grid dimensions to put icons in
+#   gridheight
+IconRegion              "=500x100+0-0" South West 30 30
+
+# Title bar buttons
+LeftTitleButton         "resize.xbm"=f.resize
+RightTitleButton        "minimize.xbm"=f.iconify
+RightTitleButton        "maximize.xbm"=f.fullzoom
+RightTitleButton        "close.xbm"=f.delete
+
+Icons
+{
+        "luakit"        "www2.xbm"
+        "urxvt"         "term1.xbm"
+        "XTerm"         "term2.xbm"
+        "lfm"           "filemanager.xbm"
+        "ranger"        "filemanager.xbm"
+        "MC"            "filemanager.xbm"
+}
+
+#  Some windows don't need a title bar
+NoTitle
+{
+        "gkrellm"
+        "lfm"
+        "mc"
+        "ranger"
+        "oclock"
+        "Top"
+        "xclock"
+        "xeyes"
+        "xbiff"
+        "xload"
+	"xterm"
+	"urxvt"
+        "TWM Icon Manager"
+}
+
+#  This defines sets of windows which when started should have the 
+#  cursor move to them.
+
+WarpCursor
+{
+        "xterm"
+        "Xterm"
+        "urxvt"
+        "x3270"
+	"emacs"
+}
+
+# Define some useful functions for motion-based actions.
+
+MoveDelta 3
+Function "move-or-lower" { f.move f.deltastop f.lower }
+Function "move-or-raise" { f.move f.deltastop f.raise }
+Function "move-or-iconify" { f.move f.deltastop f.iconify }
+
+# Set some useful bindings.  Sort of uwm-ish, sort of simple-button-ish
+# Button1=left, Button2=middle, Button3=right
+# m=alt, c=ctrl, s=shift, mod4=Win
+
+Button1     =           : root : f.menu "defops"
+
+Button1     = m         : window|icon : f.function "move-or-lower"
+Button2     = m         : window|icon : f.iconify
+Button3     = m         : window|icon : f.function "move-or-raise"
+
+Button1     =           : title : f.function "move-or-raise"
+Button2     =           : title : f.raiselower
+
+Button1     =           : icon : f.function "move-or-iconify"
+Button2     =           : icon : f.iconify
+
+Button1     =           : iconmgr : f.iconify
+Button2     =           : iconmgr : f.iconify
+
+# Hold Alt and Tab cycles through windows bringing up focus
+
+Function "winup" { f.circleup }
+"Tab"       = m         : root|window|frame|title : f.function "winup"
+
+
+# Function keys definitions.
+
+"F2"        =  m        : all     : f.exec "dmenu_run"
+"F4"        =  m        : all     : f.delete
+"F11"       =           : all     : f.fullzoom
+"F11"       =  s        : all     : f.iconify
+
+# Other keyboard shortcuts
+
+"Return"    = mod4      : all     : f.exec "urxvt &"
+"Return"    = s,mod4    : all     : f.exec "xterm &"
+"t"         = mod4      : all     : f.exec "urxvt &"
+"t"         = s,mod4    : all     : f.exec "st &"
+"e"         = mod4      : all     : f.exec "rox &" 
+"e"         = s,mod4    : all     : f.exec "thunar &"
+"f"         = mod4      : all     : f.fullzoom
+"p"         = mod4      : all     : f.exec "dmenu_run"
+
+"j"         = mod4      : all     : f.circleup
+"k"         = mod4      : all     : f.circleup
+"c"         = s,mod4    : all     : f.restart
+
+# And a menus with the usual things
+
+menu "defops"
+{
+        "Twm"	f.title
+        "XTerm"         !"xterm &"
+        "URxvt"         !"urxvt &"
+        ""		          f.nop
+        "File Managers" f.menu "File"
+        "Fun"           f.menu "Fun"
+        "Graphics"      f.menu "Graphics"
+        "Internet"      f.menu "Internet"
+        "Multimedia"    f.menu "Multimedia"
+        "Utilities"	    f.menu "Utilities"
+        ""		          f.nop
+        "Window Ops"    f.menu "Window Ops"
+        "Kill"		      f.destroy
+        "Delete"	      f.delete
+        "Refresh"	      f.refresh
+        ""		          f.nop
+        "(Re)Start"	    f.menu "Restart"
+        "Exit"		      f.menu "Quit"
+}
+
+menu "File"
+{
+        "lfm"           !"urxvt -name lfm -geometry 140x40 -e lfm &"
+        "MC"            !"urxvt -name MC -geometry 140x40 -e mc &"
+        "Nautilus"      !"nautilus &"
+        "Ranger"        !"urxvt -name ranger -e ranger &"
+        "Rox Filer"     !"rox &"
+        "Thunar"        !"thunar &"
+        "Worker"        !"worker &"
+}
+
+menu "Fun"
+{
+        "oclock"        !"oclock &"
+        "xclock"        !"xclock &"
+        "xeyes"         !"xeyes &"
+}
+
+menu "Graphics"
+{
+        "Ristretto"     !"ristretto &"
+        "XBM Browser"   !"xbmbrowser &"
+}
+
+menu "Internet"
+{
+        "Firefox"       !"firefox &"
+        "irssi"         !"urxvt -e irssi &"
+        "Luakit"        !"luakit &"
+        "Pidgin"        !"pidgin &"
+        "XChat"         !"xchat &"
+}
+
+menu "Multimedia"
+{
+        "Rhythmbox"     !"rhythmbox &"
+        "SMPlayer"      !"smplayer &"
+        "Youtube"       !"smtube &"
+}
+
+menu "Utilities"
+{
+        "Calculator"	!"xcalc &"
+        "XFCE Terminal" !"xfce4-terminal &"
+        "Top"	      	!"urxvt -T Top -n Top -e top &"
+        "Xfontsel"      !"xfontsel &"
+        "Xman"		!"xman &"
+        "Xmag"		!"xmag &"
+        "Editres"	!"editres &"
+        ""		 f.nop
+        "Emacs"		!"emacs &"
+        #"Mail"		!"xmh -font fixed &"
+        #""		 f.nop
+        "XLock"		!"xlock -mode random &"
+        "Reset X defaults" !"xrdb -load $HOME/.Xdefaults"
+}
+
+menu "Window Ops"
+{
+        "Iconify"	      f.iconify
+        "Resize"	      f.resize
+        "Move"		      f.move
+        "Raise"		      f.raise
+        "Lower"		      f.lower
+        ""		          f.nop
+        "Focus"		      f.focus
+        "Unfocus"	      f.unfocus
+        "Show Iconmgr"	f.showiconmgr
+        "Hide Iconmgr"	f.hideiconmgr
+}
+
+menu "Restart"
+{
+        "Restart"	f.restart
+        ""              f.nop
+        "twm"           f.startwm "twm"
+        "Fluxbox"       f.startwm "fluxbox"
+        "fvwm2"         f.startwm "fvwm2"
+        "mwm"		f.startwm "mwm"
+        "olwm"		f.startwm "olwm"
+        "i3"            f.startwm "i3"
+        "XFCE4"         f.startwm "startxfce4"
+        ""		          f.nop
+        "dummy"		f.startwm "xterm"
+}
+menu "Quit"
+{
+        "Don't quit"	f.nop
+         ""		          f.nop
+        "Really Quit"	  f.quit
+}

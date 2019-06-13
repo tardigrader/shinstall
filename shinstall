@@ -1,0 +1,240 @@
+#!/usr/local/bin/bash
+
+# Colors!
+RESET="\e[0m"
+BLUE="\e[34m"
+GREEN="\e[32m"
+RED="\e[31m"
+DONE="${GREEN}DONE!${RESET}"
+
+# Main folders for categorized dotfiles.
+PKGLIST_DIR="$(pwd)/pkg_lists"
+LISP_DIR="$HOME/source/lisp"
+DOT_ED_DIR="$(pwd)/editors"
+DOT_WM_DIR="$(pwd)/wm"
+DOT_SH_DIR="$(pwd)/shells"
+
+######################################################################
+# Set PKGMAN to the package manager for the system/OS to install on  #
+######################################################################
+if hash pkg_add 2>/dev/null;
+then
+  PKGMAN="pkg_add"
+elif hash zypper 2>/dev/null;
+then
+  PKGMAN="zypper"
+elif hash apt 2>/dev/null;
+then
+  PKGMAN="apt"
+elif hash dnf 2>/dev/null;
+then
+  PKGMAN="dnf"
+elif hash yum 2>/dev/null;
+then
+  PKGMAN="yum"
+fi
+
+######################################################################
+# Usage                                                              #
+######################################################################
+usage()
+{
+cat<<END
+Usage: 
+$0 [option]
+
+Options:
+-h          --help 
+-c          --create    Generate a file of all installed packages
+-e          --emacs     Install Emacs configs
+-i          --install   Install packages from pkg_file in pkg_lists/
+            --lisp      Install LISP stuff
+-v          --vim       Install vim configs and dependencies
+END
+}
+
+######################################################################
+# Create a listing of all installed packages and store in a file     #
+#                                                                    # 
+# This file should preferably be manually edited afterwards to       #
+# remove some of the "cruft".                                        #
+######################################################################
+create_done()
+{
+  echo -e    "$DONE"
+  echo -e    "${BLUE}The package listing should probably be manually edited.${RESET}"
+}
+
+create_pkglist()
+{
+  if [[ $PKGMAN = "dnf" ]] || [[ $PKGMAN == "yum" ]];
+  then
+    echo -e -n "{$BLUE}Populating file "
+    echo -e -n "${RESET}$PKGLIST_DIR/rpm_pkg_list-$(date "+%Y-%m-%d").txt "
+    echo -e    "${BLUE}with installed packages."
+    rpm -qa --qf "%{NAME}\n" > $PKGLIST_DIR/rpm_pkg_list-$(date "+%Y-%m-%d").txt
+    create_done
+  elif [[ $PKGMAN = "pkg_add" ]];
+  then
+    echo -e -n "${BLUE}Populating file "
+    echo -e -n "${RESET}$PKGLIST_DIR/bsd_pkg_list-$(date "+%Y-%m-%d").txt "
+    echo -e    "${BLUE}with installed packages. "
+    pkg_info -mz > $PKGLIST_DIR/bsd_pkg_list-$(date "+%Y-%m-%d").txt
+    create_done
+  elif [[ $PKGMAN = "apt" ]];
+  then
+    echo -e -n "${BLUE}Populating file ${RESET}"
+    echo -e -n "$PKGLIST_DIR/deb_pkg_list-$(date "+%Y-%m-%d").txt "
+    echo -e    "${BLUE}with installed packages."
+    dpkg- query - f '${binary: Package}\n' > $PKGLIST_DIR/deb_pkg_list-$(date "+%Y-%m-%d").txt
+    create_done
+  elif [[ $PKGMAN = "zypper" ]];
+  then
+    echo -e -n "${BLUE}Populating file ${RESET}"
+    echo -e -n "$PKGLIST_DIR/zyp_pkg_list-$(date "+%Y-%m-%d").txt "
+    echo -e    "${BLUE}with installed packages."
+    rpm -qa --qf "%{NAME}\n" > $PKGLIST_DIR/zyp_pkg_list-$(date "+%Y-%m-%d").txt
+    create_done
+  else
+    echo -e "${RED}Error: Unknown system or package management software.${RESET}"
+  fi
+}
+
+######################################################################
+# Install packages from names listed in a file                       #
+######################################################################
+install_pkgs()
+{
+  PKGLIST_ERR="${RED}There is no package list to install from. Aborting.${RESET}"
+
+  case $PKGMAN in
+    "dnf")
+      if [ -e "$PKGLIST_DIR"/dnf_pkg_list.txt ];
+      then
+        echo "Installing .rpm packages"
+        sudo dnf -y install $(cat $PKGLIST_DIR/rpm_pkg_list.txt)
+      else
+        echo $PKGLIST_ERR
+      fi
+      ;;
+    "yum")
+      if [ -e "$PKGLIST_DIR/rpm_pkg_list.txt" ];
+      then
+        echo "Installing .rpm packages"
+        sudo yum -y install $(cat $PKGLIST_DIR/rpm_pkg_list.txt)
+      else
+        echo $PKGLIST_ERR
+      fi
+      ;;
+    "zypper")
+      if [ -e "$PKGLIST_DIR/zypper_pkg_list.txt" ];
+      then
+        echo "Installing .rpm packages for OpenSUSE"
+        sudo zypper install -y $(cat $PKGLIST_DIR/zypper_pkg_list.txt)
+      else
+        echo $PKGLIST_ERR
+      fi
+      ;;
+    "apt")
+      if [ -e "$PKGLIST_DIR/apt_pkg_list.txt" ];
+      then
+        echo "Installing .deb packages"
+        sudo apt install --yes $(cat $PKGLIST_DIR/apt_pkg_list.txt)
+      else
+        echo $PKGLIST_ERR
+      fi
+      ;;
+    "pkg_add")
+      if [ -e "$PKGLIST_DIR/bsd_pkg_list.txt" ];
+      then
+        echo "Installing packages for OpenBSD"
+        doas pkg_add -l $PKGLIST_DIR/bsd_pkg_list.txt
+      else
+        echo $PKGLIST_ERR
+      fi 
+      ;;
+  esac
+}
+
+install_vim()
+{
+  # Install Plug:
+  curl -s -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  echo "Installing vim configuration files and plugins."
+  echo "This might take a minute or two."
+  cp $DOT_ED_DIR/vim/.vimrc $HOME
+  # cmake is necessary for ycmd (part of YouCompleteMe) to build!
+  vim -E +'PlugInstall --sync' +qa
+  echo -e "\n$DONE"
+}
+
+install_emacs()
+{
+  echo "Installing Emacs configuration files and plugins."
+  echo "This might take a minute or two."
+
+  cp $DOT_ED_DIR/emacs/.emacs $HOME
+  mkdir -p $HOME/.emacs.d/org
+  cp $DOT_ED_DIR/emacs/emacs_ini.org $HOME/.emacs.d/
+  echo -e "$DONE"
+}
+
+quicklisp_install()
+{
+  cd $LISP_DIR/quicklisp
+  curl -s -O https://beta.quicklisp.org/quicklisp.lisp
+  curl -s -O https://beta.quicklisp.org/release-key.txt
+  curl -s -O https://beta.quicklisp.org/quicklisp.lisp.asc
+  echo "Verifying quicklisp signature"
+  gpg --import release-key.txt 2>/dev/null
+  gpg --verify quicklisp.lisp.asc quicklisp.lisp
+  echo -e "$DONE"
+
+}
+
+install_lisp()
+{
+  echo "Downloading Quicklisp to $LISP_DIR/quicklisp"
+  if [ -d $LISP_DIR/quicklisp ];
+  then
+    quicklisp_install
+  else
+    mkdir -p $LISP_DIR/quicklisp
+    quicklisp_install
+  fi
+}
+
+######################################################################
+# MAIN PROGRAM                                                       #
+######################################################################
+if [[ $# -eq 0 ]];
+then
+  usage
+else
+  case $1 in
+    "-h"|"--help")
+      usage
+      ;;
+    "-c"|"--create")
+      create_pkglist
+      ;;
+    "-e"|"--emacs")
+      install_emacs
+      ;;
+    "-i"|"--install")
+      install_pkgs
+      ;;
+    "--lisp")
+      install_lisp
+      ;;
+    "-v"|"--vim")
+      install_vim
+      ;;
+    *)
+      echo -e "${RED}Invalid option${RESET}"
+      usage
+      exit 1
+      ;;
+  esac
+fi

@@ -1,0 +1,19 @@
+# This is Git's per-user configuration file.
+[user]
+	name = Krister Löfgren
+	email = k@xyzzy.nu
+[credential]
+	helper = cache --timeout=3600
+[color]
+  diff   = auto
+  status = auto
+  branch = auto
+  ui     = auto
+[alias]
+	oneline = log --oneline --pretty=format:'%C(yellow)%h%C(reset)%C(auto)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%C(reset)'
+	highscore = shortlog -sn --all --no-merges  # Who has commited most?
+	whodunnit = blame                           # Who wrote what?
+	alias = config --get-regexp alias           # List git aliases
+	donetoday = log --since=00:00:00 --all --no-merges --oneline --author=k@xyzzy.nu  # What have I been up to today?
+	graph = log --graph --all --decorate --stat --date=iso               # Nice complex logs
+	ignore = "!gi() { curl -L -s https://www.gitignore.io/api/$@ ;}; gi" # Use gitignore.io for sweet .gitignore files

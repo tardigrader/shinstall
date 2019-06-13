@@ -1,0 +1,557 @@
+* Init>
+
+#+BEGIN_SRC emacs-lisp
+(custom-set-variables
+ '(inhibit-startup-screen t))
+
+;; Set default window size
+;;
+(if (display-graphic-p)
+    (progn
+      (setq initial-frame-alist
+            '(
+              (tool-bar-lines . 0)
+              (width . 80) ; chars
+              (height . 50) ; lines
+              ;;
+              ))
+
+      (setq default-frame-alist
+            '(
+              (tool-bar-lines . 0)
+              (width . 80)
+              (height . 50)
+              ;;
+              )))
+  (progn
+    (setq initial-frame-alist
+          '(
+            (tool-bar-lines . 0)))
+    (setq default-frame-alist
+          '(
+            (tool-bar-lines . 0)))))
+#+END_SRC
+* Packages
+
+#+BEGIN_SRC emacs-lisp
+(package-refresh-contents)
+
+(unless (package-installed-p 'use-package)
+	(package-install 'use-package))
+#+END_SRC
+
+** Ensure these packages
+#+BEGIN_SRC emacs-lisp
+
+(use-package paredit
+	:ensure t
+	:hook ((lisp-mode emacs-lisp-mode) . paredit-mode))
+
+(use-package company
+	:ensure t)
+
+(use-package company-auctex
+	:ensure t
+	:after (company latex))
+
+(use-package company-lua
+	:ensure t)
+
+(use-package company-math
+	:ensure t)
+
+(use-package company-php
+	:ensure t)
+
+(use-package org-ref
+	:ensure t)
+#+END_SRC
+
+* Typography
+
+custom-set-faces was added by Custom.
+If you edit it by hand, you could mess it up, so be careful.
+Your init file should contain only one such instance.
+If there is more than one, they won't work right.
+
+#+BEGIN_SRC emacs-lisp
+(custom-set-faces
+ '(default ((t (:family "Liberation Mono" :foundry "1ASC" :slant normal :weight normal :height 100 :width normal)))))
+#+END_SRC
+
+* Default startup directory
+
+#+BEGIN_SRC emacs-lisp
+  (setq default-directory "~/.emacs.d/org/")
+#+END_SRC
+
+* Theme
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'after-init-hook (lambda () (load-theme 'misterioso)))
+#+END_SRC
+
+* Personal information
+
+#+BEGIN_SRC emacs-lisp
+  (setq user-full-name "Krister Löfgren"
+		user-mail-address "krister@tardigrader.se")
+#+END_SRC
+
+* Backup-stuff
+
+Put all backup files in it's own directory for less clutter.
+
+#+BEGIN_SRC emacs-lisp
+  (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+  (setq delete-old-versions -1)
+  (setq version-control t)
+  (setq vc-make-backup-files t)
+  (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
+#+END_SRC
+
+* Warn when opening files bigger than 100MB
+
+#+BEGIN_SRC emacs-lisp
+  (setq large-file-warning-threshold 100000000)
+#+END_SRC
+
+* Remove the toolbar and scrollbar
+
+Remove the useless toolbar and the scrollbar for more real estate.
+
+#+BEGIN_SRC emacs-lisp
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+#+END_SRC
+
+* Show column position in the mode line
+
+#+BEGIN_SRC emacs-lisp
+  (column-number-mode t)
+#+END_SRC
+
+* Change "yes or no" to "y or n"
+
+#+BEGIN_SRC emacs-lisp
+  (fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+* Time and Calendar
+
+#+BEGIN_SRC emacs-lisp
+  (setq european-calendar-style 't)              ; European style
+												 ; calendar
+  (setq calendar-week-start-day 1)               ; Week starts monday
+  (setq didsplay-time-24hr-format 't)
+  (setq display-time-mode 't)
+#+END_SRC
+
+* Highlighting
+
+#+BEGIN_SRC emacs-lisp
+  (global-font-lock-mode 't) 	; Basic syntax highlightning
+
+  (global-hl-line-mode 1) 	; Turn on highlighting current line
+#+END_SRC
+
+* Automaticall introduce closing parenthesis, brackets, braces etc.
+
+#+BEGIN_SRC emacs-lisp
+  (electric-pair-mode 1)                   	; Automatically insert
+						; counterparen
+  (setq blink-matching-paren-distance nil)	; Blinking parenthesis
+  (setq show-paren-style 'expression)		; Highlight text between parens
+  (show-paren-mode 1) 				;
+#+END_SRC
+
+* Spacing, tabs
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default show-trailing-whitespace t)
+  (setq-default tab-width 4)
+#+END_SRC
+
+* TeX and LaTeX
+
+#+BEGIN_SRC emacs-lisp
+(use-package latex
+	:after auctex)
+(use-package auctex
+	:mode ("\\.tex\\'" . TeX-latex-mode)
+	:ensure t)
+(use-package latex-preview-pane
+	:after (latex auctex)
+	:ensure t)
+(setq TeX-auto-save t)
+(setq TeX-parse-self t)
+(setq-default TeX-master nil)
+#+END_SRC
+
+* File management
+
+Open Dired with Shift-F2
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "S-<f2>")
+  (lambda ()
+    (interactive)
+    (dired-other-frame "~/.emacs.d/org")))
+#+END_SRC
+
+* TODO Keyboard shortcut to browse urls with eww
+* yasnippet
+
+#+BEGIN_SRC emacs-lisp
+(use-package yasnippet
+	:ensure t
+	:config
+	(yas-global-mode 1))
+
+(use-package yasnippet-snippets
+	:ensure t
+	:init
+	(add-to-list 'load-path
+		"~/.emacs.d/plugins/yasnippet")
+)
+
+#+END_SRC
+
+* Ivy
+#+BEGIN_SRC emacs-lisp
+(use-package ivy
+	:ensure t
+	:config
+	(ivy-mode 1)
+)
+
+(use-package swiper
+	:after ivy
+	:ensure t
+)
+
+(use-package counsel
+	:after ivy
+	:ensure t
+	:config
+	(counsel-mode 1)
+)
+
+(setq ivy-use-virtual-buffers t)
+(setq enable-recursive-minibuffers t)
+(global-set-key "\C-s" 'swiper)
+
+#+END_SRC
+
+* Keyboard shortcuts
+
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-x %") 'split-window-below)
+;(global-set-key (kbd "C-x ") 'split-window-right)
+#+END_SRC
+
+Make C-c C-a “select all”
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key "\C-c\C-a" 'mark-whole-buffer)
+#+END_SRC
+
+Let marks be set when shift arrowing, everybody does this
+#+BEGIN_SRC emacs-lisp
+  (setq shift-select-mode t)
+  (delete-selection-mode 1)
+#+END_SRC
+
+Font scaling, like in firefox
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-+") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+#+END_SRC
+
+Zoom in/out with CTRL+mouse wheel.
+#+BEGIN_SRC emacs-lisp
+  (global-set-key [C-mouse-4]
+  '(lambda () (interactive) (text-scale-increase 1)))
+  (global-set-key [C-mouse-5]
+  '(lambda () (interactive) (text-scale-decrease 1)))
+#+END_SRC
+
+Browse URL of buffer
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'web-mode-hook
+		  'local-set-key (kbd "C-c C-v") 'browse-url-of-buffer)
+#+END_SRC
+* Scheme
+
+#+BEGIN_SRC emacs-lisp
+(use-package quack
+	:ensure t
+	:mode "\\.scm\\'"
+	:config
+	(setq quack-global-menu-p nil)
+	(setq quack-default-program "gsi")
+	)
+#+END_SRC
+* LISP - Slime
+
+#+BEGIN_SRC emacs-lisp
+(use-package slime
+	:ensure t
+	:config)
+	(setq inferior-lisp-program "/bin/sbcl"); default LISP program
+	(setq slime-contribs '(slime-fancy))
+#+END_SRC
+* Python
+#+BEGIN_SRC emacs-lisp
+(use-package elpy
+	:ensure t
+	:mode ("\\.py\\'" . python-mode)
+	:config
+	(elpy-enable))
+#+END_SRC
+
+*Use the Python standard interpreter (default):*
+
+(setq python-shell-interpreter "python"
+      python-shell-interpreter-args "-i")
+
+*Use Jupyter console (recommended for interactive Python):*
+
+(setq python-shell-interpreter "jupyter"
+      python-shell-interpreter-args "console --simple-prompt")
+
+*Use IPython:*
+
+(setq python-shell-interpreter "ipython"
+      python-shell-interpreter-args "-i --simple-prompt")
+
+Note that various issues with plotting have been reported when running
+IPython 5 in Emacs under Windows. We recommend using Jupyter console
+instead.
+
+* Ruby
+
+#+BEGIN_SRC emacs-lisp
+(use-package ac-inf-ruby
+	:ensure t
+	:config
+	(eval-after-load 'auto-complete
+      '(add-to-list 'ac-modes 'inf-ruby-mode))
+    :hook
+	(add-hook 'inf-ruby-mode-hook 'ac-inf-ruby-enable)
+)
+
+
+(use-package robe
+	:ensure t
+	:mode ("\\.rb\\'" . ruby-mode)
+	:hook
+	(add-hook 'ruby-mode-hook 'robe-mode)
+)
+
+(eval-after-load 'company
+  '(push 'company-robe company-backends))
+(add-hook 'robe-mode-hook 'ac-robe-setup)
+(autoload 'inf-ruby-minor-mode "inf-ruby" "Run an inferior Ruby process" t)
+(add-hook 'ruby-mode-hook 'inf-ruby-minor-mode)
+
+; Bind auto-complete to TAB in inf-ruby buffers:
+(eval-after-load 'inf-ruby '
+	'(define-key inf-ruby-mode-map (kbd "TAB") 'auto-complete))
+
+#+END_SRC
+
+* Web / HTML / CSS
+
+#+BEGIN_SRC emacs-lisp
+(use-package web-mode
+	:ensure t
+	:mode (("\\.html?\\'"     . web-mode)
+		   ("\\.phtml\\'"     .	web-mode)
+		   ("\\.tpl\\.php\\'" . web-mode)
+		   ("\\.[agj]sp\\'"   . web-mode)
+		   ("\\.as[cp]x\\'"   . web-mode)
+		   ("\\.erb\\'"       . web-mode)
+		   ("\\.mustache\\'"  . web-mode)
+		   ("\\.djhtml\\'"    . web-mode)
+		   ("\\.css\\'"       . web-mode))
+	:config
+	(web-mode))
+#+END_SRC
+
+* which-key
+
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+	:ensure t
+	:config
+	(which-key-mode)
+	:hook
+	(add-hook 'after-init-hook 'global-company-mode))
+#+END_SRC
+
+* Improve the resolution of doc-view
+
+#+BEGIN_SRC emacs-lisp
+  (setq doc-view-resolution 200)
+#+END_SRC
+
+* Load elfeed-org
+
+Initialize elfeed-org
+This hooks up elfeed-org to read the configuration when elfeed
+is started with =M-x elfeed=
+
+#+BEGIN_SRC emacs-lisp
+(use-package elfeed
+	:ensure t)
+
+;(use-package elfeed-org
+;	:after elfeed
+;	:ensure t)
+;	:config
+;	(elfeed-org))
+#+END_SRC
+
+Optionally specify a number of files containing elfeed
+configuration. If not set then the location below is used.
+Note: The customize interface is also supported.
+
+#+BEGIN_SRC emacs-lisp
+; (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
+#+END_SRC
+
+* Org-mod settings
+
+Shift-cursor-select
+
+#+BEGIN_SRC emacs-lisp
+(setq org-support-shift-select 'always)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(setq org-catch-invisible-edits 'error) ; Don't allow edits in folded
+									    ; space
+#+END_SRC
+
+Capture with CTRL-c c
+
+#+BEGIN_SRC emacs-lisp
+(define-key global-map "\C-cc" 'org-capture)
+#+END_SRC
+
+** Visual settings
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-hide-leading-stars t
+  org-ellipsis " »"            ; For collapsed items
+  org-hide-emphasis-markers t)  ; Hide delimiters for styling text.
+
+#+END_SRC
+
+#+RESULTS:
+: t
+
+** Default directories
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-directory "~/.emacs.d/org/")
+  (setq org-default-notes-file (concat org-directory "notes.org"))
+  (setq org-ref-notes-directory "~/.emacs.d/org/references/")
+  (setq org-ref-bibliography-notes "~/.emacs.d/org/references/articles.org")
+  (setq org-ref-default-bibliography '("~/.emacs.d/org/references/articles.bib"))
+  (setq org-ref-pdf-directory "~/.emacs.d/org/references/pdfs")
+  (setq org-studies-directory "~/.emacs.d/org/studies")
+
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-mode-hook 'turn-on-auto-fill)
+#+END_SRC
+
+** Refiling
+
+#+BEGIN_SRC emacs-lisp
+  (setq
+  org-reverse-note-order nil ; File at the bottom of an entry
+  org-refile-allow-creating-parent-nodes (quote confirm)
+  org-refile-targets (quote ((org-agenda-files :maxlevel . 10 )))
+  org-refile-use-outline-path 'file)
+#+END_SRC
+
+** Capture templates
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-capture-templates
+		'(("t" "Todo")
+		  ("ta"
+		  "General Todos"
+		  entry
+		  (file+headline "~/.emacs.d/org/todo/todos.org" "Tasks")
+		   "* TODO %?\n  %i\n  %a")
+		  ("td"
+		  "Todo Studier"
+		  entry
+		  (file+headline "~/.emacs.d/org/todo/study-todo.org" "Tasks")
+		   "* TODO %?\n  %i\n  %a")
+		  ("m"
+		  "Mötesanteckningar"
+		  entry
+		  (file+datetree "~/.emacs.d/org/meeting-notes.org")
+		   "* Deltagare: %?\nMötesanteckning, %U\n %i\n %a")
+		  ("s"
+		  "Studiedagbok"
+		  entry
+		  (file+datetree "~/.emacs.d/org/studies/study-journal.org")
+		   "* %?\nDagbok för %U\n  %i\n  %a")
+		  ("d"
+		  "Dagbok"
+		  entry
+		  (file+datetree "~/.emacs.d/org/private/diary.org")
+		   "* %?\nDagbok för %U\n  %i\n  %a")
+		  ("a"
+		  "Article"
+		  entry
+		  (file+headline "~/.emacs.d/org/articles.org" "Article")
+		   "* %^{Title} %(org-set-tags)  :article: \n:PROPERTIES:\n:
+		   Created: %U\n:Linked: %a\n:END:\n%i\nBrief description:\n%?"
+		   :prepend t
+		   :empty-lines 1
+		   :created t)
+	))
+#+END_SRC
+
+** Org-agenda
+
+#+BEGIN_SRC emacs-lisp
+(custom-set-variables
+ '(org-agenda-files
+   (quote
+	("/home/krister/.emacs.d/org/computer/dator.org"
+	"/home/krister/.emacs.d/org/Getting Started with Orgzly.org"
+	"/home/krister/.emacs.d/org/articles.org"
+	"/home/krister/.emacs.d/org/kom-ihåg.org"
+	"/home/krister/.emacs.d/org/meeting-notes.org"
+	"/home/krister/.emacs.d/org/notes.org"
+	"/home/krister/.emacs.d/org/refile.org"
+	"/home/krister/.emacs.d/org/todo/study-todo.org"
+	"/home/krister/.emacs.d/org/todo/föreningsarbete.org"
+	"/home/krister/.emacs.d/org/todo/computer_todo.org"
+)))
+)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (define-key global-map "\C-ca" 'org-agenda)
+#+END_SRC
+
+
+
+
+** TODO Org-protocol
+(server-start)
+(add-to-list 'load-pathgcon "~/path/to/org/protocol/")
+(require 'org-protocol)
+
