@@ -1,4 +1,4 @@
-#Install shell necessities!
+# Install shell necessities!
 
 Dotfiles and other configs
 
