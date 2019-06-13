@@ -61,39 +61,50 @@ END
 ######################################################################
 create_done()
 {
+  PKGLIST_SIZE="$(wc -l $PKGLIST_FILE | cut -d ' ' -f 1)"
+  echo -e    "${BLUE}Number of packages: ${PKGLIST_SIZE}${RESET}"
+  if [[ $PKGLIST_SIZE -gt 1000 ]];
+  then
+    echo -e "${RED}That's ALOT of packages. It's highly recommended that you trim it down!${RESET}"
+  else
+    echo -e    "${BLUE}The package listing should probably be manually edited.${RESET}"
+  fi
   echo -e    "$DONE"
-  echo -e    "${BLUE}The package listing should probably be manually edited.${RESET}"
 }
 
 create_pkglist()
 {
   if [[ $PKGMAN = "dnf" ]] || [[ $PKGMAN == "yum" ]];
   then
+    PKGLIST_FILE="$PKGLIST_DIR/rpm_pkg_list-$(date '+%Y-%m-%d').txt"
     echo -e -n "${BLUE}Populating file "
-    echo -e -n "${RESET}$PKGLIST_DIR/rpm_pkg_list-$(date "+%Y-%m-%d").txt "
+    echo -e -n "${RESET}${PKGLIST_FILE} "
     echo -e    "${BLUE}with installed packages."
-    rpm -qa --qf "%{NAME}\n" > "$PKGLIST_DIR"/rpm_pkg_list-"$(date '+%Y-%m-%d')".txt
+    rpm -qa --qf "%{NAME}\n" > "$PKGLIST_FILE"
     create_done
   elif [[ $PKGMAN = "pkg_add" ]];
   then
+    PKGLIST_FILE="$PKGLIST_DIR/bsd_pkg_list-$(date '+%Y-%m-%d').txt"
     echo -e -n "${BLUE}Populating file "
-    echo -e -n "${RESET}$PKGLIST_DIR/bsd_pkg_list-$(date "+%Y-%m-%d").txt "
+    echo -e -n "${RESET}${PKGLIST_FILE} "
     echo -e    "${BLUE}with installed packages. "
-    pkg_info -mz > "$PKGLIST_DIR"/bsd_pkg_list-"$(date '+%Y-%m-%d')".txt
+    pkg_info -mz > "${PKGLIST_FILE}"
     create_done
   elif [[ $PKGMAN = "apt" ]];
   then
+    PKGLIST_FILE="$PKGLIST_DIR/deb_pkg_list-$(date '+%Y-%m-%d').txt"
     echo -e -n "${BLUE}Populating file ${RESET}"
-    echo -e -n "$PKGLIST_DIR/deb_pkg_list-$(date "+%Y-%m-%d").txt "
+    echo -e -n "${PKGLIST_FILE} "
     echo -e    "${BLUE}with installed packages."
-    dpkg- query - f '${binary: Package}\n' > "$PKGLIST_DIR"/deb_pkg_list-"$(date '+%Y-%m-%d')".txt
+    dpkg- query - f '${binary: Package}\n' > "${PKGLIST_FILE}"
     create_done
   elif [[ $PKGMAN = "zypper" ]];
   then
+    PKGLIST_FILE="$PKGLIST_DIR/zyp_pkg_list-$(date '+%Y-%m-%d').txt"
     echo -e -n "${BLUE}Populating file ${RESET}"
-    echo -e -n "$PKGLIST_DIR/zyp_pkg_list-$(date "+%Y-%m-%d").txt "
+    echo -e -n "${PKGLIST_FILE} "
     echo -e    "${BLUE}with installed packages."
-    rpm -qa --qf "%{NAME}\n" > "$PKGLIST_DIR"/zyp_pkg_list-"$(date '+%Y-%m-%d')".txt
+    rpm -qa --qf "%{NAME}\n" > "${PKGLIST_FILE}"
     create_done
   else
     echo -e "${RED}Error: Unknown system or package management software.${RESET}"
@@ -109,7 +120,7 @@ install_pkgs()
 
   case $PKGMAN in
     "dnf")
-      if [ -e "$PKGLIST_DIR"/dnf_pkg_list.txt ];
+      if [ -e "$PKGLIST_DIR"/rpm_pkg_list.txt ];
       then
         echo "Installing .rpm packages"
         sudo dnf -y install $(cat $PKGLIST_DIR/rpm_pkg_list.txt)
