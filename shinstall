@@ -1,4 +1,4 @@
-#!/usr/local/bin/bash
+#!/bin/bash
 
 # Colors!
 RESET="\e[0m"
@@ -69,31 +69,31 @@ create_pkglist()
 {
   if [[ $PKGMAN = "dnf" ]] || [[ $PKGMAN == "yum" ]];
   then
-    echo -e -n "{$BLUE}Populating file "
+    echo -e -n "${BLUE}Populating file "
     echo -e -n "${RESET}$PKGLIST_DIR/rpm_pkg_list-$(date "+%Y-%m-%d").txt "
     echo -e    "${BLUE}with installed packages."
-    rpm -qa --qf "%{NAME}\n" > $PKGLIST_DIR/rpm_pkg_list-$(date "+%Y-%m-%d").txt
+    rpm -qa --qf "%{NAME}\n" > "$PKGLIST_DIR"/rpm_pkg_list-"$(date '+%Y-%m-%d')".txt
     create_done
   elif [[ $PKGMAN = "pkg_add" ]];
   then
     echo -e -n "${BLUE}Populating file "
     echo -e -n "${RESET}$PKGLIST_DIR/bsd_pkg_list-$(date "+%Y-%m-%d").txt "
     echo -e    "${BLUE}with installed packages. "
-    pkg_info -mz > $PKGLIST_DIR/bsd_pkg_list-$(date "+%Y-%m-%d").txt
+    pkg_info -mz > "$PKGLIST_DIR"/bsd_pkg_list-"$(date '+%Y-%m-%d')".txt
     create_done
   elif [[ $PKGMAN = "apt" ]];
   then
     echo -e -n "${BLUE}Populating file ${RESET}"
     echo -e -n "$PKGLIST_DIR/deb_pkg_list-$(date "+%Y-%m-%d").txt "
     echo -e    "${BLUE}with installed packages."
-    dpkg- query - f '${binary: Package}\n' > $PKGLIST_DIR/deb_pkg_list-$(date "+%Y-%m-%d").txt
+    dpkg- query - f '${binary: Package}\n' > "$PKGLIST_DIR"/deb_pkg_list-"$(date '+%Y-%m-%d')".txt
     create_done
   elif [[ $PKGMAN = "zypper" ]];
   then
     echo -e -n "${BLUE}Populating file ${RESET}"
     echo -e -n "$PKGLIST_DIR/zyp_pkg_list-$(date "+%Y-%m-%d").txt "
     echo -e    "${BLUE}with installed packages."
-    rpm -qa --qf "%{NAME}\n" > $PKGLIST_DIR/zyp_pkg_list-$(date "+%Y-%m-%d").txt
+    rpm -qa --qf "%{NAME}\n" > "$PKGLIST_DIR"/zyp_pkg_list-"$(date '+%Y-%m-%d')".txt
     create_done
   else
     echo -e "${RED}Error: Unknown system or package management software.${RESET}"
@@ -114,7 +114,7 @@ install_pkgs()
         echo "Installing .rpm packages"
         sudo dnf -y install $(cat $PKGLIST_DIR/rpm_pkg_list.txt)
       else
-        echo $PKGLIST_ERR
+        echo "$PKGLIST_ERR"
       fi
       ;;
     "yum")
@@ -123,7 +123,7 @@ install_pkgs()
         echo "Installing .rpm packages"
         sudo yum -y install $(cat $PKGLIST_DIR/rpm_pkg_list.txt)
       else
-        echo $PKGLIST_ERR
+        echo "$PKGLIST_ERR"
       fi
       ;;
     "zypper")
@@ -132,7 +132,7 @@ install_pkgs()
         echo "Installing .rpm packages for OpenSUSE"
         sudo zypper install -y $(cat $PKGLIST_DIR/zypper_pkg_list.txt)
       else
-        echo $PKGLIST_ERR
+        echo "$PKGLIST_ERR"
       fi
       ;;
     "apt")
@@ -141,7 +141,7 @@ install_pkgs()
         echo "Installing .deb packages"
         sudo apt install --yes $(cat $PKGLIST_DIR/apt_pkg_list.txt)
       else
-        echo $PKGLIST_ERR
+        echo "$PKGLIST_ERR"
       fi
       ;;
     "pkg_add")
@@ -150,7 +150,7 @@ install_pkgs()
         echo "Installing packages for OpenBSD"
         doas pkg_add -l $PKGLIST_DIR/bsd_pkg_list.txt
       else
-        echo $PKGLIST_ERR
+        echo "$PKGLIST_ERR"
       fi 
       ;;
   esac
@@ -163,7 +163,7 @@ install_vim()
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   echo "Installing vim configuration files and plugins."
   echo "This might take a minute or two."
-  cp $DOT_ED_DIR/vim/.vimrc $HOME
+  cp "$DOT_ED_DIR"/vim/.vimrc "$HOME"
   # cmake is necessary for ycmd (part of YouCompleteMe) to build!
   vim -E +'PlugInstall --sync' +qa
   echo -e "\n$DONE"
@@ -174,15 +174,15 @@ install_emacs()
   echo "Installing Emacs configuration files and plugins."
   echo "This might take a minute or two."
 
-  cp $DOT_ED_DIR/emacs/.emacs $HOME
-  mkdir -p $HOME/.emacs.d/org
-  cp $DOT_ED_DIR/emacs/emacs_ini.org $HOME/.emacs.d/
+  cp "$DOT_ED_DIR"/emacs/.emacs "$HOME"
+  mkdir -p "$HOME"/.emacs.d/org
+  cp "$DOT_ED_DIR"/emacs/emacs_ini.org "$HOME"/.emacs.d/
   echo -e "$DONE"
 }
 
 quicklisp_install()
 {
-  cd $LISP_DIR/quicklisp
+  cd "$LISP_DIR"/quicklisp
   curl -s -O https://beta.quicklisp.org/quicklisp.lisp
   curl -s -O https://beta.quicklisp.org/release-key.txt
   curl -s -O https://beta.quicklisp.org/quicklisp.lisp.asc
@@ -196,11 +196,11 @@ quicklisp_install()
 install_lisp()
 {
   echo "Downloading Quicklisp to $LISP_DIR/quicklisp"
-  if [ -d $LISP_DIR/quicklisp ];
+  if [ -d "$LISP_DIR"/quicklisp ];
   then
     quicklisp_install
   else
-    mkdir -p $LISP_DIR/quicklisp
+    mkdir -p "$LISP_DIR"/quicklisp
     quicklisp_install
   fi
 }
