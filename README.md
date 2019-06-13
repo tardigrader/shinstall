@@ -6,7 +6,7 @@ Dotfiles and other configs
 
 Like so:
 
-`
+```
 ./shinstall [option]
 
 Options:
@@ -16,4 +16,4 @@ Options:
 -i          --install   Install packages from pkg_file in pkg_lists/
             --lisp      Install LISP stuff
 -v          --vim       Install vim configs and dependencies
-`
+```
