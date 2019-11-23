@@ -3,6 +3,7 @@
 # sh/ksh initialization
 
 export ENV=$HOME/.kshrc
+export LC_ALL=sv_SE.UTF-8
 
 PATH=$HOME/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/X11R6/bin:/usr/local/bin:/usr/local/sbin:/usr/games
 
