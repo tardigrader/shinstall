@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Colors!
-RESET="\e[0m"
-BLUE="\e[34m"
-GREEN="\e[32m"
-RED="\e[31m"
+RESET='\033[00m'
+BLUE='\033[0;34m'
+GREEN='\033[0;32m'
+RED='\033[0;31m'
 DONE="${GREEN}DONE!${RESET}"
 
 # Main folders for categorized dotfiles.
