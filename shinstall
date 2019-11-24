@@ -14,6 +14,11 @@ DOT_ED_DIR="$(pwd)/editors"
 DOT_WM_DIR="$(pwd)/wm"
 DOT_SH_DIR="$(pwd)/shells"
 
+OS="$(uname -s)"
+
+# Lisp
+SBCL=$(which sbcl)
+
 ######################################################################
 # Set PKGMAN to the package manager for the system/OS to install on  #
 ######################################################################
@@ -61,20 +66,20 @@ END
 ######################################################################
 create_done()
 {
-  PKGLIST_SIZE="$(wc -l $PKGLIST_FILE | cut -d ' ' -f 1)"
-  echo -e    "${BLUE}Number of packages: ${PKGLIST_SIZE}${RESET}"
-  if [[ $PKGLIST_SIZE -gt 1000 ]];
+  PKGLIST_SIZE="$(wc -l < $PKGLIST_FILE | tr -d ' ')"
+  echo -e "${BLUE}Number of packages:${RESET} ${PKGLIST_SIZE}"
+  if [[ "$PKGLIST_SIZE" -gt 1000 ]];
   then
     echo -e "${RED}That's ALOT of packages. It's highly recommended that you trim it down!${RESET}"
   else
-    echo -e    "${BLUE}The package listing should probably be manually edited.${RESET}"
+    echo -e "${BLUE}The package listing should probably be manually edited.${RESET}"
   fi
-  echo -e    "$DONE"
+  echo -e "$DONE"
 }
 
 create_pkglist()
 {
-  if [[ $PKGMAN = "dnf" ]] || [[ $PKGMAN == "yum" ]];
+  if [[ "$PKGMAN" = "dnf" ]] || [[ "$PKGMAN" == "yum" ]];
   then
     PKGLIST_FILE="$PKGLIST_DIR/rpm_pkg_list-$(date '+%Y-%m-%d').txt"
     echo -e -n "${BLUE}Populating file "
@@ -82,15 +87,21 @@ create_pkglist()
     echo -e    "${BLUE}with installed packages."
     rpm -qa --qf "%{NAME}\n" > "$PKGLIST_FILE"
     create_done
-  elif [[ $PKGMAN = "pkg_add" ]];
+  elif [[ "$PKGMAN" = "pkg_add" ]];
   then
-    PKGLIST_FILE="$PKGLIST_DIR/bsd_pkg_list-$(date '+%Y-%m-%d').txt"
+    PKGLIST_FILE="$PKGLIST_DIR/${OS}_pkg_list-$(date '+%Y-%m-%d').txt"
     echo -e -n "${BLUE}Populating file "
     echo -e -n "${RESET}${PKGLIST_FILE} "
     echo -e    "${BLUE}with installed packages. "
-    pkg_info -mz > "${PKGLIST_FILE}"
+        if [[ "$OS" = "OpenBSD" ]];
+        then
+          pkg_info -mz > "${PKGLIST_FILE}"
+        elif [[ "$OS" = "NetBSD" ]];
+        then
+          pkg_info -u | cut -d ' ' -f1 > "${PKGLIST_FILE}"
+        fi
     create_done
-  elif [[ $PKGMAN = "apt" ]];
+  elif [[ "$PKGMAN" = "apt" ]];
   then
     PKGLIST_FILE="$PKGLIST_DIR/deb_pkg_list-$(date '+%Y-%m-%d').txt"
     echo -e -n "${BLUE}Populating file ${RESET}"
@@ -98,7 +109,7 @@ create_pkglist()
     echo -e    "${BLUE}with installed packages."
     dpkg- query - f '${binary: Package}\n' > "${PKGLIST_FILE}"
     create_done
-  elif [[ $PKGMAN = "zypper" ]];
+  elif [[ "$PKGMAN" = "zypper" ]];
   then
     PKGLIST_FILE="$PKGLIST_DIR/zyp_pkg_list-$(date '+%Y-%m-%d').txt"
     echo -e -n "${BLUE}Populating file ${RESET}"
@@ -118,12 +129,12 @@ install_pkgs()
 {
   PKGLIST_ERR="${RED}There is no package list to install from. Aborting.${RESET}"
 
-  case $PKGMAN in
+  case "$PKGMAN" in
     "dnf")
       if [ -e "$PKGLIST_DIR"/rpm_pkg_list.txt ];
       then
         echo "Installing .rpm packages"
-        sudo dnf -y install $(cat $PKGLIST_DIR/rpm_pkg_list.txt)
+        sudo dnf -y install "$(cat $PKGLIST_DIR/rpm_pkg_list.txt)"
       else
         echo "$PKGLIST_ERR"
       fi
@@ -132,7 +143,7 @@ install_pkgs()
       if [ -e "$PKGLIST_DIR/rpm_pkg_list.txt" ];
       then
         echo "Installing .rpm packages"
-        sudo yum -y install $(cat $PKGLIST_DIR/rpm_pkg_list.txt)
+        sudo yum -y install "$(cat $PKGLIST_DIR/rpm_pkg_list.txt)"
       else
         echo "$PKGLIST_ERR"
       fi
@@ -141,7 +152,7 @@ install_pkgs()
       if [ -e "$PKGLIST_DIR/zypper_pkg_list.txt" ];
       then
         echo "Installing .rpm packages for OpenSUSE"
-        sudo zypper install -y $(cat $PKGLIST_DIR/zypper_pkg_list.txt)
+        sudo zypper install -y "$(cat $PKGLIST_DIR/zypper_pkg_list.txt)"
       else
         echo "$PKGLIST_ERR"
       fi
@@ -150,16 +161,16 @@ install_pkgs()
       if [ -e "$PKGLIST_DIR/apt_pkg_list.txt" ];
       then
         echo "Installing .deb packages"
-        sudo apt install --yes $(cat $PKGLIST_DIR/apt_pkg_list.txt)
+        sudo apt install --yes "$(cat $PKGLIST_DIR/apt_pkg_list.txt)"
       else
         echo "$PKGLIST_ERR"
       fi
       ;;
     "pkg_add")
-      if [ -e "$PKGLIST_DIR/bsd_pkg_list.txt" ];
+      if [ -e "$PKGLIST_DIR/${OS}_pkg_list.txt" ];
       then
-        echo "Installing packages for OpenBSD"
-        doas pkg_add -l $PKGLIST_DIR/bsd_pkg_list.txt
+        echo "Installing packages for "
+        doas pkg_add -l "$PKGLIST_DIR"/"${OS}"_pkg_list.txt
       else
         echo "$PKGLIST_ERR"
       fi 
@@ -177,7 +188,7 @@ install_vim()
   cp "$DOT_ED_DIR"/vim/.vimrc "$HOME"
   # cmake is necessary for ycmd (part of YouCompleteMe) to build!
   vim -E +'PlugInstall --sync' +qa
-  echo -e "\n$DONE"
+  echo -e "\\n$DONE"
 }
 
 install_emacs()
@@ -193,7 +204,7 @@ install_emacs()
 
 quicklisp_install()
 {
-  cd "$LISP_DIR"/quicklisp
+  cd "$LISP_DIR"/quicklisp || exit 1
   curl -s -O https://beta.quicklisp.org/quicklisp.lisp
   curl -s -O https://beta.quicklisp.org/release-key.txt
   curl -s -O https://beta.quicklisp.org/quicklisp.lisp.asc
@@ -201,7 +212,15 @@ quicklisp_install()
   gpg --import release-key.txt 2>/dev/null || gpg2 --import release-key.txt 2>/dev/null
   gpg --verify quicklisp.lisp.asc quicklisp.lisp || gpg2 --verify quicklisp.lisp.asc quicklisp.lisp
   echo -e "$DONE"
+  cd - || exit 1
+  quicklisp_setup
+}
 
+quicklisp_setup()
+{
+  echo "Setting up Quicklisp"
+  $SBCL --script setup_quicklisp.lisp
+  echo -e "$DONE Quicklisp is setup!"
 }
 
 install_lisp()
@@ -214,7 +233,6 @@ install_lisp()
     mkdir -p "$LISP_DIR"/quicklisp
     quicklisp_install
   fi
-  cd -
 }
 
 ######################################################################
