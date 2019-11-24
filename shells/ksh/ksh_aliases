@@ -27,8 +27,8 @@ fi
 alias df='df -h'
 alias ll='ls -la'
 alias lsa='ls -a'
-#TODO alias lsdirs='ls -la | grep :*/'            # Show directories only
-#TODO alias lsexe='ls -lA | grep \*'              # Show executables only
+alias lsdirs='ls -laF | grep :*/'            # Show directories only
+alias lsexe='ls -lAF | grep \*'              # Show executables only
 alias lshid='ls -dF .*'
 alias mount='mount | column -t'
 alias path="echo $PATH | tr -s ':' '\n'"            # Pretty print $PATH
@@ -51,5 +51,5 @@ alias pingalocal='echo 192.168.0.{1..255} | xargs -n1 ping -c1'
 ### Misc aliases ###
 
 alias fingerprints='ssh-keygen -lv -f ~/.ssh/known_hosts'
-alias topcommands='cut -f1 -d " " ~/.bash_history | sort | uniq -c | sort -nr | head -12'
+alias topcommands='cut -f1 -d " " ~/.ksh_history | sort | uniq -c | sort -nr | head -12'
 alias vimsplit='vim -O '        # Edit multiple files split horizontally 

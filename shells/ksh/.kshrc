@@ -25,7 +25,7 @@ set -o ignoreeof
 ######################################################################
 # Fun Stuff                                                          #
 ######################################################################
-if [ $(uname) = "OpenBSD" ] || [ $(uname) = "NetBSD" ];
+if [ "$(uname)" = "OpenBSD" ] || [ "$(uname)" = "NetBSD" ];
 then
   echo
   echo "~~~~~~ RUN BSD ~~~~~~ RUN BSD ~~~~~~ RUN BSD ~~~~~~"

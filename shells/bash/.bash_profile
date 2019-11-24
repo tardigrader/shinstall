@@ -10,7 +10,7 @@ PATH=:$HOME/bin:$HOME/.local/bin:\
   /usr/X11/bin:/usr/bin/X11:/usr/X11R6/bin
 
 # NetBSD pkgsrc installs to /usr/pkg/{bin,sbin} by default
-if [ $(uname) = "NetBSD" ];
+if [ "$(uname -s)" = "NetBSD" ];
 then
   PATH=${PATH}:/usr/pkg/bin:/usr/pkg/sbin
 fi
@@ -62,9 +62,9 @@ else
 fi
 
 # Set a default URL when starting w3m without one.
-export WWW_HOME="https://duckduckgo.com"
+export WWW_HOME="https://duckduckgo.com/lite"
 
 # Source individual per-interactive-shell startup file
-if [ -e $HOME/.bashrc ]; then
-    source $HOME/.bashrc
+if [ -e "$HOME"/.bashrc ]; then
+    source "$HOME"/.bashrc
 fi
