@@ -198,8 +198,8 @@ quicklisp_install()
   curl -s -O https://beta.quicklisp.org/release-key.txt
   curl -s -O https://beta.quicklisp.org/quicklisp.lisp.asc
   echo "Verifying quicklisp signature"
-  gpg --import release-key.txt 2>/dev/null
-  gpg --verify quicklisp.lisp.asc quicklisp.lisp
+  gpg --import release-key.txt 2>/dev/null || gpg2 --import release-key.txt 2>/dev/null
+  gpg --verify quicklisp.lisp.asc quicklisp.lisp || gpg2 --verify quicklisp.lisp.asc quicklisp.lisp
   echo -e "$DONE"
 
 }
@@ -214,6 +214,7 @@ install_lisp()
     mkdir -p "$LISP_DIR"/quicklisp
     quicklisp_install
   fi
+  cd -
 }
 
 ######################################################################
