@@ -1,0 +1,149 @@
+! $OpenBSD: dot.Xdefaults,v 1.3 2014/07/10 10:22:59 jasper Exp $
+!----------------------------------------------------------------------
+
+! hard contrast: *background: #f9f5d7
+*background: #fbf1c7
+! soft contrast: *background: #f2e5bc
+*foreground: #3c3836
+! Black + DarkGrey
+*color0:  #fdf4c1
+*color8:  #928374
+! DarkRed + Red
+*color1:  #cc241d
+*color9:  #9d0006
+! DarkGreen + Green
+*color2:  #98971a
+*color10: #79740e
+! DarkYellow + Yellow
+*color3:  #d79921
+*color11: #b57614
+! DarkBlue + Blue
+*color4:  #458588
+*color12: #076678
+! DarkMagenta + Magenta
+*color5:  #b16286
+*color13: #8f3f71
+! DarkCyan + Cyan
+*color6:  #689d6a
+*color14: #427b58
+! LightGrey + White
+*color7:  #7c6f64
+*color15: #3c3836
+
+*color24:  #076678
+*color66:  #427b58
+*color88:  #9d0006
+*color96:  #8f3f71
+*color100: #79740e
+*color108: #8ec07c
+*color109: #83a598
+*color130: #af3a03
+*color136: #b57614
+*color142: #b8bb26
+*color167: #fb4934
+*color175: #d3869b
+*color208: #fe8019
+*color214: #fabd2f
+*color223: #ebdbb2
+*color228: #f2e5bc
+*color229: #fbf1c7
+*color230: #f9f5d7
+*color234: #1d2021
+*color235: #282828
+*color236: #32302f
+*color237: #3c3836
+*color239: #504945
+*color241: #665c54
+*color243: #7c6f64
+*color244: #928374
+*color245: #928374
+*color246: #a89984
+*color248: #bdae93
+*color250: #d5c4a1
+
+!======================================================================
+! XTerm settings
+!======================================================================
+
+XTerm*loginShell:         true
+XTerm*VT100.geometry:     80x50
+XTerm*faceName:           Terminus:style=Regular:size=10
+XTerm*dynamicColors:      true
+XTerm*utf8:               2
+XTerm*eightBitInput:      true
+XTerm*saveLines:          512
+XTerm*scrollKey:          true
+XTerm*scrollTtyOutput:    false
+XTerm*scrollBar:          true
+XTerm*rightScrollBar:     true
+XTerm*jumpScroll:         true
+XTerm*multiScroll:        true
+XTerm*toolBar:            false
+
+!======================================================================
+! URxvt settings
+!======================================================================
+
+URxvt.loginShell:         true
+!URxvt.termName:           rxvt-unicode-256color
+URxvt.geometry:           80x40
+URxvt.internalBorder:     5
+URxvt.font:               xft:IBM Plex Mono:size=10
+                          ! Or possibly:
+                          ! xft:Fira Code:size=11
+                          ! xft:Source Code Pro:style=Regular:size=10
+!URxvt.letterSpace:        -1
+URxvt.cursorBlink:        true
+!URxvt.dynamicColors:      on
+
+! Scrollbar style - rxvt (default), plain (most compact), next, or xterm
+! URxvt.scrollstyle: plain
+! Or just turn it off:
+URxvt.scrollBar:          false
+
+URxvt.perl-ext-common:    default,urxvt-colors,selection-to-clipboard,url-select,keyboard-select
+URxvt.perl-lib:          ...:~/.urxvt/
+
+! URL-select -- Use keyboard shortcuts to select URLs.
+URxvt.keysym.M-u:         perl:url-select:select_next
+! Select which program to handle urls.
+URxvt.url-select.launcher: urxvt -e /usr/local/bin/w3m
+! Underline any urls.
+URxvt.url-select.underline: true
+! Set the color for underline text.
+URxvt.colorUL:            #FF7E00
+! Set the color for the underline itself if not use the foreground color.
+URxvt*underlineColor:     #FFC
+
+!======================================================================
+! XFT font stuff
+!======================================================================
+
+!Xft.dpi:                 90
+!Xft.antialias:           true
+!Xft.rgba:                rgb
+!Xft.hinting:             true
+!Xft.hintstyle:           hintslight
+
+!======================================================================
+! xclock
+!======================================================================
+
+xclock*Update:                      1
+xclock*Analog:                      false
+xclock*Foreground:                  white
+xclock*Background:                  black
+
+!======================================================================
+! ssh-askpass
+!======================================================================
+
+x11-ssh-askpass*font:                -*-terminal-medium-*-*-*-14-*-*-*-*-*-*-* 
+*ssh-askpass*background:             #000000
+*ssh-askpass*foreground:             #ffffff
+*ssh-askpass.Button*background:      #000000
+*ssh-askpass.Indicator*foreground:   #ff9900
+*ssh-askpass.Indicator*background:   #090909
+*ssh-askpass*topShadowColor:         #000000
+*ssh-askpass*bottomShadowColor:      #000000
+*ssh-askpass.*borderWidth:           1
