@@ -6,4 +6,5 @@ xset -b                           # No BEEP!
 # OR: xmodmap .xmodmap.capslock_win
 # I prefer to make CAPS LOCK another ESC
 xmodmap .xmodmap.capslock_esc
+xautolock -time 3 -locker "i3lock -i ~/Pictures/Wallpapers/lockscreen.png" &
 exec i3
