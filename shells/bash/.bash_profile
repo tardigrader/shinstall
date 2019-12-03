@@ -4,10 +4,9 @@
 
 unset PATH
 
-PATH=:$HOME/bin:$HOME/.local/bin:\
-  /bin:/usr/bin:/sbin:/usr/sbin:\
-  /usr/local/bin:/usr/local/sbin:/usr/games:\
-  /usr/X11/bin:/usr/bin/X11:/usr/X11R6/bin
+PATH=:$HOME/bin:$HOME/.local/bin:/bin:/usr/bin:/sbin:/usr/sbin:\
+/usr/local/bin:/usr/local/sbin:/usr/games:/usr/X11/bin:/usr/bin/X11:\
+/usr/X11R6/bin
 
 # NetBSD pkgsrc installs to /usr/pkg/{bin,sbin} by default
 if [ "$(uname -s)" = "NetBSD" ];
@@ -22,6 +21,9 @@ export PATH
 export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
 # ... or force ignoredups and ignorespace
 export HISTCONTROL=ignoreboth
+
+# Add a timestamp to each command.
+export HISTTIMEFORMAT="%Y/%m/%d %H:%M:%S:   "
 
 # Append to the history file, don't overwrite it
 shopt -s histappend

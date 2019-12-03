@@ -37,8 +37,17 @@ xterm*|rxvt*)
     ;;
 esac
 
+# Check the window size after each command and, if necessary, update the values of LINES and COLUMNS
+shopt -s checkwinsize
+
 # Enable completion of hostnames.
 shopt -s hostcomplete
+
+# Load bash completions
+if [ -e /etc/profile.d/bash_completion.sh ];
+then
+  source /etc/profile.d/bash_completion.sh
+fi
 
 # Enable completion for pass
 if [ -e /usr/share/bash-completion/completions/pass ];
