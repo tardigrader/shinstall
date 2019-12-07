@@ -31,6 +31,7 @@ Plug 'jlanzarotta/bufexplorer'          " Buffers
 Plug 'vim-syntastic/syntastic'          " Syntax checking
 Plug 'python-mode/python-mode'          " Python IDE for Vim
 Plug 'tpope/vim-fugitive'               " Git wrapper
+Plug 'tpope/vim-commentary'             " Easy commenting
 Plug 'gitgutter/Vim'                    " Git gutter
 Plug 'kien/ctrlp.vim'                   " Fuzzy search 
 Plug 'Valloric/YouCompleteMe', { 'do': './install.py' } " Code completion
@@ -69,10 +70,34 @@ nmap <F3> :set number!<CR>
 nnoremap <leader><C-l> 
       \:nohlsearch<cr>:diffupdate<cr>:syntax sync fromstart<cr>zz<c-l>
 
+" Go to next buffer
+nmap <Leader>bn :bn<CR>
+
+" Go to previous buffer
+nmap <Leader>bp :bp<CR>
+
+" Edit .vimrc
+nnoremap <leader>ev :split $MYVIMRC<cr>
+
+" Source .vimrc -- but also see augroup VimConfig below
+nnoremap <leader>sv :source $MYVIMRC<cr>
+
 "-- Emacs-like stuff---------------------------------------------------------
+
+" Center current line on screen
+nmap <C-l> zz
 
 " Ctrl-g aborts current action
 imap <C-g> <Esc>
+
+" Ctrl-x b CtrlP buffers
+nmap <C-x>b :CtrlPBuffer<CR>
+
+" Ctrl-x B BufExplorer
+nmap <C-x>B :BufExplorer<CR>
+
+" Ctrl-x 0 Cancel split window
+nmap <C-x>0 :only<CR>
 
 " Alt-<   Top of file, Alt-> Bottom, like in Emacs
 nmap < gg
@@ -100,6 +125,9 @@ noremap  <F1> <ESC>
 "if $TERM ==# "xterm-256color"
 "    set termguicolors
 "endif
+"
+"
+let g:rainbow#pairs = [['(', ')'], ['[', ']']]
 
 let g:gruvbox_italic=1
 colorscheme gruvbox
@@ -195,6 +223,11 @@ let NERDTreeQuitOnOpen = 1          " Automatically close after opening a file
 let NERDTreeDirArrows = 1           " Show pretty arrows on directories
 let NERDTreeShowHidden = 1          " Show hidden files
 
+"-- CTRLP ----------------------------------------------------------------
+"
+" Ignore files in .gitignore
+let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']
+
 "-- BACKUP AND SWAP FILES ---------------------------------------------------
 
 " Create backup directory if it doesn't exist.
@@ -213,11 +246,24 @@ set directory^=~/.vim/_temp//       " Where to put swap files.
 set undofile                        " Save the undo tree
 set undodir=~/.vim/_backup/         " ...in this directory. 
 
-
 " -- PROGRAMMING FILETYPE SPECIFIC ------------------------------------------
+
+" Python
+let g:pymode = 1
+let g:pymode_options = 1
+
+" Rainbow parenthesis
 let g:rainbow_active = 1                " Enable rainbow parenthesis
 
 au FileType ruby setlocal sts=2 sw=2    " Enable width of 2 for ruby tabbing
+"
+" PHP
+augroup PHP
+  autocmd!
+  autocmd FileType php setlocal textwidth=100
+  autocmd FileType php setlocal colorcolumn=120 " Show colored column at col 120
+                                                " THAT'S A TOO LONG LINE!
+augroup END
 
 " Load indentation rules and plugins according to the detected filetype.
 
@@ -242,6 +288,24 @@ if has('autocmd')"
   autocmd FileType mail   setl shiftwidth=2
   autocmd FileType mail   setl expandtab
 endif
+"
+" Syntastic
+" Syntastic configuration
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+let g:syntastic_aggregate_errors = 1
+
+" Syntastic configuration for PHP
+let g:syntastic_php_checkers = ['php', 'phpmd', 'phpcs']
+let g:syntastic_php_phpcs_args = "--severity=3 --standard=/home/krister/Dokument/php-codesniffer/3.3.2/ruleset.xml"
+let g:syntastic_php_phpmd_post_args = "/home/krister/Dokument/phpmd/2.6.0/ruleset.xml"
+
+let g:syntastic_javascript_checkers=['eslint']
+let g:syntastic_javascript_eslint_args="--config /home/krister/Dokument/eslint/eslintrc"
+
+let g:syntastic_python_checkers=['flake8']
 
 
 " From wiki.archlinux.org
